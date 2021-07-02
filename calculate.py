@@ -29,7 +29,7 @@ def get_combination(data_list, index=0, result=[]):
 def actually_analysis(combination_list, lose_key, continue_lose_num):
 
 	def lose_argument(game_result):
-		total_pts = game_result["visitor_total_pts"] + game_result["home_total_pts"]
+		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		is_odd = False
 		if total_pts % 2 == 0:
 			is_odd = True
@@ -68,6 +68,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			"贏的機率": win_count / len(combination_list) * 100,
 			"組合數": len(combination_list)}
 
+
 def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_numb, consider_ignore_game=False):
 	def lose_argument(game_result):
 		total_pts = game_result["visitor_total_pts"] + game_result["home_total_pts"]
@@ -100,16 +101,24 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
 			"測試次數": run_numb}
 
+
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
-print("len(data_list):", len(game_result_list[0:2]))
+print("比賽天數:", len(game_result_list[0:3]))
 start_time = time.time()
-
-for d in game_result_list[0:2]:
+game_combination = get_combination(game_result_list[0:3])
+end_time = time.time()
+print("比賽組合數:", len(game_combination))
+print(f"{end_time - start_time} 秒計算排列組合")
+for d in game_combination:
 	temp = []
 	for a in d:
-		temp.append(a.id)
+		re = (a.visitor_total_pts + a.home_total_pts) % 2
+		if re == 0:
+			temp.append("雙")
+		else:
+			temp.append("單")
 	print(temp)
-# print(get_combination(game_result_list[0:2]))
-end_time = time.time()
-print(f"{end_time - start_time} 秒計算排列組合")
+
+print(actually_analysis(game_combination, "雙", 2))
+
