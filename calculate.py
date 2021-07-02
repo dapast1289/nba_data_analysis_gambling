@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from random import randint
 
 from repository.analysis_record_repository import AnalysisRecord
@@ -70,7 +71,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 
 # 隨機取樣法
 def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, uuid, consider_ignore_game=False):
-
+	print(uuid, randon_sample_count)
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		if total_pts % 2 == 0:
@@ -93,34 +94,27 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon
 				numb = continue_lose_num
 			if numb == 0:
 				is_loss = True
+				break
 		if is_loss:
 			lose_count += 1
 		else:
 			win_count += 1
 	end_time = time.time()
 	record = AnalysisRecord()
-	record.season
-	record.period_days
+	record.season = game_result_list[0][0].season
+	record.period_days = len(game_result_list)
 	record.uuid = uuid
 	record.lose_keyword = lose_key
 	record.continue_lose_num = continue_lose_num
 	record.sample_count = randon_sample_count
-	record.sample_start_date = game_result_list[0][0].game_start_time.date
-	record.sample_end_date = game_result_list[len(game_result_list)-1][0].game_start_time.date
+	record.sample_start_date = game_result_list[0][0].game_start_time.date()
+	record.sample_end_date = game_result_list[len(game_result_list)-1][0].game_start_time.date()
 	record.win_count = win_count
 	record.lose_count = lose_count
 	record.win_percent = win_count / (win_count + lose_count) * 100
 	record.lose_percent = lose_count / (win_count + lose_count) * 100
 	record.cost_of_seconds = end_time - start_time
-
-	print(str(record))
-	# return {"lose_percent": lose_count / (win_count + lose_count) * 100,
-	# 		"win_percent": win_count / (win_count + lose_count) * 100,
-	# 		"lose_count": lose_count,
-	# 		"win_count": win_count,
-	# 		"lose_keyword": lose_key,
-	# 		"continue_lose_num": continue_lose_num,
-	# 		"sample_count": randon_sample_count}
+	return record
 
 
 def test_actually(game_result_list):
@@ -138,18 +132,42 @@ def test_actually(game_result_list):
 
 	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
+	test_1 = randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())
+	print("隨機挑選組合勝負計算", str(test_1))
 	actually_randon_combination_test_end = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000, uuid.uuid1()))
+	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
+	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
+	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 500000, uuid.uuid4())))
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
 
-def test_randon_case(game_result_list):
-	print(randon_result_analysis(game_result_list, "雙", 2, 500000))
+def test_randon_case_by_multi_thread(game_result_list, lose_keyword, continue_lose_num, sample_count):
+	max_threads = 1
+	sample_per_work = []
+	divide_sample = sample_count // max_threads
+	remain_sample = sample_count % max_threads
+	for x in range(max_threads):
+		if x == max_threads-1:
+			sample_per_work.append(divide_sample+remain_sample)
+		else:
+			sample_per_work.append(divide_sample)
+
+	with ThreadPoolExecutor(max_workers=max_threads) as executor:
+		futures = []
+		for sample in sample_per_work:
+			future = executor.submit(randon_result_analysis, game_result_list, lose_keyword,
+									 continue_lose_num, sample, uuid.uuid4())
+			futures.append(future)
+		print("wait completed")
+		for future in as_completed(futures):
+			print(future.result())
+		print("end")
 
 
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
-test_actually(game_result_list[0:7])
+# test_actually(game_result_list[0:9])
+
+for x in range(5):
+	test_randon_case_by_multi_thread(game_result_list, "雙", 8, 100000)
+
