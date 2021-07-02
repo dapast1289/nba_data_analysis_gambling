@@ -69,9 +69,10 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
 			"組合數": len(combination_list)}
 
+
 # 隨機取樣法
 def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, uuid, consider_ignore_game=False):
-	print(uuid, randon_sample_count)
+	# print(uuid, randon_sample_count)
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		if total_pts % 2 == 0:
@@ -142,7 +143,7 @@ def test_actually(game_result_list):
 
 
 def test_randon_case_by_multi_thread(game_result_list, lose_keyword, continue_lose_num, sample_count):
-	max_threads = 1
+	max_threads = 1000
 	sample_per_work = []
 	divide_sample = sample_count // max_threads
 	remain_sample = sample_count % max_threads
@@ -154,20 +155,31 @@ def test_randon_case_by_multi_thread(game_result_list, lose_keyword, continue_lo
 
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
 		futures = []
+		thread_start_time = time.time()
+		total_time = 0
+		total_sample = 0
+		result_list = []
 		for sample in sample_per_work:
 			future = executor.submit(randon_result_analysis, game_result_list, lose_keyword,
 									 continue_lose_num, sample, uuid.uuid4())
 			futures.append(future)
-		print("wait completed")
 		for future in as_completed(futures):
-			print(future.result())
-		print("end")
+			# print(future.result())
+			total_time += future.result().cost_of_seconds
+			total_sample += future.result().sample_count
+			result_list.append(future.result())
+		thread_end_time = time.time()
+		print("thread_time", thread_end_time - thread_start_time)
+		print("total_time", total_time)
+		print("total_time", total_sample)
+		for result in result_list:
+			print(str(result))
 
 
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
 # test_actually(game_result_list[0:9])
 
-for x in range(5):
-	test_randon_case_by_multi_thread(game_result_list, "雙", 8, 100000)
+# for x in range(5):
+test_randon_case_by_multi_thread(game_result_list, "雙", 8, 1000000)
 
