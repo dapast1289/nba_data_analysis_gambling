@@ -1,11 +1,12 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
+import datetime
 import time
 from concurrent.futures import as_completed, ThreadPoolExecutor
 
 import requests
 from bs4 import BeautifulSoup, Comment
-import datetime
+
 from repository.nba_repository import MatchInfo, MatchInfoRepository
 
 domain = "https://www.basketball-reference.com"

@@ -1,7 +1,6 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, DATETIME, UniqueConstraint, Index, \
-	Boolean, text, func
+from sqlalchemy import create_engine, Column, Integer, String, DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -50,17 +49,6 @@ class MatchInfo(Base):
 	overtimes = Column("overtimes", String(255))
 	attendance = Column("attendance", String(255))
 	game_remarks = Column("game_remarks", String(255))
-
-	# def __repr__(self):
-	# 	return """""" % ()
-		# return "match_info: (id: % s, match_id: % s, game_start_time: % s, date_game_href: % s, " \
-		# 	   "visitor_team_name: % s, visitor_team_name_href: % s, visitor_pts: % s, " \
-		# 	   "home_team_name: % s, home_team_name_href: % s, home_pts: % s, " \
-		# 	   "box_score_text: % s, box_score_text_href: % s, overtimes: % s, attendance: % s, game_remarks: % s" \
-		# 	   % (self.id, self.match_id, self.game_start_time, self.date_game_href,
-		# 		  self.visitor_team_name, self.visitor_team_name_href, self.visitor_pts,
-		# 		  self.home_team_name, self.home_team_name_href, self.home_pts,
-		# 		  self.box_score_text, self.box_score_text_href, self.overtimes, self.attendance, self.game_remarks)
 
 
 def init_db():

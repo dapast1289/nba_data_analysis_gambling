@@ -14,7 +14,4 @@
 #     print_hi('PyCharm')
 #
 # # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-import time
 
-from calculate import get_combination
-from repository.nba_repository import MatchInfoRepository
