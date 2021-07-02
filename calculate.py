@@ -1,8 +1,10 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+import uuid
 from random import randint
 
+from repository.analysis_record_repository import AnalysisRecord
 from repository.nba_repository import MatchInfoRepository
 
 
@@ -67,7 +69,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			"組合數": len(combination_list)}
 
 # 隨機取樣法
-def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_numb, consider_ignore_game=False):
+def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, uuid=uuid.uuid1(), consider_ignore_game=False):
 
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
@@ -77,8 +79,9 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 			return "單"
 
 	win_count = 0
-	loss_count = 0
-	for idx in range(run_numb):
+	lose_count = 0
+	start_time = time.time()
+	for idx in range(randon_sample_count):
 		is_loss = False
 		numb = continue_lose_num
 		for per_game_result in game_result_list:
@@ -91,13 +94,31 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 			if numb == 0:
 				is_loss = True
 		if is_loss:
-			loss_count += 1
+			lose_count += 1
 		else:
 			win_count += 1
-	return {"必輸機率": loss_count / (win_count + loss_count) * 100,
-			"必贏機率": win_count / (win_count + loss_count) * 100,
-			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
-			"測試次數": run_numb}
+	end_time = time.time()
+	record = AnalysisRecord()
+	record.season
+	record.period_days
+	record.uuid = uuid
+	record.lose_keyword = lose_key
+	record.continue_lose_num = continue_lose_num
+	record.sample_count = randon_sample_count
+	record.sample_start_date = game_result_list[0][0].game_start_time.date
+	record.sample_end_date = game_result_list[len(game_result_list)-1][0].game_start_time.date
+	record.win_count = win_count
+	record.lose_count = lose_count
+	record.win_percent = win_count / (win_count + lose_count) * 100
+	record.lose_percent = lose_count / (win_count + lose_count) * 100
+	record.cost_of_seconds = end_time - start_time
+	return {"lose_percent": lose_count / (win_count + lose_count) * 100,
+			"win_percent": win_count / (win_count + lose_count) * 100,
+			"lose_count": lose_count,
+			"win_count": win_count,
+			"lose_keyword": lose_key,
+			"continue_lose_num": continue_lose_num,
+			"sample_count": randon_sample_count}
 
 
 def test_actually(game_result_list):

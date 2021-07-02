@@ -31,10 +31,10 @@ class AnalysisRecord(Base):
 	sample_start_date = Column("sample_start_date", Date, nullable=False)
 	sample_end_date = Column("sample_end_date", Date, nullable=False)
 	win_count = Column("win_count", Integer, nullable=False)
-	loss_count = Column("loss_count", Integer, nullable=False)
+	lose_count = Column("lose_count", Integer, nullable=False)
 	lose_percent = Column("lose_percent", DOUBLE, nullable=False)
 	win_percent = Column("win_percent", DOUBLE, nullable=False)
-	cost_of_seconds = Column("cost_of_seconds", Integer, nullable=False)
+	cost_of_seconds = Column("cost_of_seconds", DOUBLE, nullable=False)
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
 	update_time = Column("update_time", DATETIME, server_default=func.now(), onupdate=func.now(), nullable=False)
 
