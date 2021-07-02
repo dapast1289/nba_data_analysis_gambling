@@ -28,15 +28,12 @@ def get_combination(data_list, index=0, result=[]):
 
 def actually_analysis(combination_list, lose_key, continue_lose_num):
 
-	def lose_argument(game_result):
+	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
-		is_odd = False
 		if total_pts % 2 == 0:
-			is_odd = True
-		if lose_key == "單":
-			return is_odd == False
-		elif lose_key == "雙":
-			return is_odd == True
+			return "雙"
+		else:
+			return "單"
 
 	win_count = 0
 	loss_count = 0
@@ -47,8 +44,8 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 		is_loss = False
 		numb = continue_lose_num
 		for game_result in per_combination:
-			if lose_argument(game_result):
-				numb = numb - 1
+			if is_add_or_odd(game_result) == lose_key:
+				numb -= 1
 				add_count += 1
 			else:
 				odd_count += 1
@@ -60,7 +57,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			loss_count += 1
 		else:
 			win_count += 1
-	return {"單雙數": add_count + odd_count, "單數": add_count, "雙數": odd_count,
+	return {"單雙總數": add_count + odd_count, "單總數": add_count, "雙總數": odd_count,
 			"單機率": add_count / (add_count + odd_count) * 100,
 			"雙機率": odd_count / (add_count + odd_count) * 100,
 			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
@@ -70,15 +67,13 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 
 
 def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_numb, consider_ignore_game=False):
-	def lose_argument(game_result):
-		total_pts = game_result["visitor_total_pts"] + game_result["home_total_pts"]
-		is_odd = False
+
+	def is_add_or_odd(game_result):
+		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		if total_pts % 2 == 0:
-			is_odd = True
-		if lose_key == "單":
-			return is_odd == False
-		elif lose_key == "雙":
-			return is_odd == True
+			return "雙"
+		else:
+			return "單"
 
 	win_count = 0
 	loss_count = 0
@@ -88,10 +83,12 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 		for per_game_result in game_result_list:
 			choose_idx = randint(0, len(per_game_result) - 1)
 			game_result = per_game_result[choose_idx]
-			if lose_argument(game_result):
+			if is_add_or_odd(game_result) == lose_key:
 				numb -= 1
 			else:
 				numb = continue_lose_num
+			if numb == 0:
+				is_loss = True
 		if is_loss:
 			loss_count += 1
 		else:
@@ -102,23 +99,35 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 			"測試次數": run_numb}
 
 
+def test_actually(game_result_list):
+	start_time = time.time()
+	game_combination = get_combination(game_result_list)
+	end_time = time.time()
+	print("比賽天數:", len(game_result_list), "比賽組合數:", len(game_combination), f"{end_time - start_time} 秒計算排列組合")
+	# for d in game_combination:
+	# 	temp = []
+	# 	for a in d:
+	# 		re = (a.visitor_total_pts + a.home_total_pts) % 2
+	# 		if re == 0:
+	# 			temp.append("雙")
+	# 		else:
+	# 			temp.append("單")
+	# 	print(temp)
+	actually_combination_test_start = time.time()
+	print("實際組合勝負計算", actually_analysis(game_combination, "雙", 2))
+	actually_combination_test_end = time.time()
+	print(f"{actually_combination_test_end - actually_combination_test_start} 秒計算排列組合")
+
+	actually_randon_combination_test_start = time.time()
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 2, 500000))
+	actually_randon_combination_test_end = time.time()
+	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
+
+
+def test_randon_case(game_result_list):
+	print(randon_result_analysis(game_result_list, "雙", 2, 500000))
+
+
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
-print("比賽天數:", len(game_result_list[0:3]))
-start_time = time.time()
-game_combination = get_combination(game_result_list[0:3])
-end_time = time.time()
-print("比賽組合數:", len(game_combination))
-print(f"{end_time - start_time} 秒計算排列組合")
-for d in game_combination:
-	temp = []
-	for a in d:
-		re = (a.visitor_total_pts + a.home_total_pts) % 2
-		if re == 0:
-			temp.append("雙")
-		else:
-			temp.append("單")
-	print(temp)
-
-print(actually_analysis(game_combination, "雙", 2))
-
+test_actually(game_result_list[0:8])
