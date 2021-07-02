@@ -6,17 +6,18 @@ from sqlalchemy.orm import sessionmaker
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
-# metadata = MetaData(engine)
 Base = declarative_base()
 
+
 def auto_str(cls):
-    def __str__(self):
-        return '%s(%s)' % (
-            type(self).__name__,
-            ', '.join('%s=%s' % item for item in vars(self).items())
-        )
-    cls.__str__ = __str__
-    return cls
+	def __str__(self):
+		return '%s(%s)' % (
+			type(self).__name__,
+			', '.join('%s=%s' % item for item in vars(self).items())
+		)
+	cls.__str__ = __str__
+	return cls
+
 
 @auto_str
 class MatchInfo(Base):
@@ -76,7 +77,7 @@ class MatchInfoRepository:
 
 	# "SELECT * FROM users where name=:name"
 	def query_from_statement(self, season):
-		data_list = self.session.query(MatchInfo).filter(MatchInfo.season == season)\
+		data_list = self.session.query(MatchInfo).filter(MatchInfo.season == season) \
 			.order_by(MatchInfo.game_start_time.asc(), MatchInfo.id).all()
 		result = []
 		index_dic = {}
@@ -97,13 +98,13 @@ class MatchInfoRepository:
 			if idx == len(data_list) - 1:
 				result.append(temp_result)
 		return result
-	# def tt(self):
-	# 	self.session.query(func.sum(MatchInfo.))
+# def tt(self):
+# 	self.session.query(func.sum(MatchInfo.))
 
-	# 1. 撈出該季所有比賽日期，依日期做從小到大排序
-	# 2. 每日先挑一場比賽做預測數據，如比賽時間兩個半小時後仍有比賽，則納入測量，需做出各種組合測試
-	# 3.
-	# 4.
-	# 5.
-	# 6.
-	# 7.
+# 1. 撈出該季所有比賽日期，依日期做從小到大排序
+# 2. 每日先挑一場比賽做預測數據，如比賽時間兩個半小時後仍有比賽，則納入測量，需做出各種組合測試
+# 3.
+# 4.
+# 5.
+# 6.
+# 7.
