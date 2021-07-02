@@ -115,10 +115,10 @@ def test_actually(game_result_list):
 
 	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 10000000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
 	actually_randon_combination_test_end = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
 	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
