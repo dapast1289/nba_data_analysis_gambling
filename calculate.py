@@ -1,11 +1,15 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
+import copy
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from decimal import Decimal
 from random import randint
+from unicodedata import decimal
 
-from repository.analysis_record_repository import AnalysisRecord
+import repository.analysis_record_repository
+from repository.analysis_record_repository import AnalysisRecord, AnalysisRecordRepository
 from repository.nba_repository import MatchInfoRepository
 
 
@@ -112,7 +116,9 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon
 	record.sample_end_date = game_result_list[len(game_result_list)-1][0].game_start_time.date()
 	record.win_count = win_count
 	record.lose_count = lose_count
+	# record.win_percent = str(win_count / (win_count + lose_count) * 100)
 	record.win_percent = win_count / (win_count + lose_count) * 100
+	# record.lose_percent = str(lose_count / (win_count + lose_count) * 100)
 	record.lose_percent = lose_count / (win_count + lose_count) * 100
 	record.cost_of_seconds = end_time - start_time
 	return record
@@ -143,6 +149,7 @@ def test_actually(game_result_list):
 
 
 def test_randon_case_by_multi_thread(game_result_list, lose_keyword, continue_lose_num, sample_count):
+	repository = AnalysisRecordRepository()
 	max_threads = 1000
 	sample_per_work = []
 	divide_sample = sample_count // max_threads
@@ -164,22 +171,34 @@ def test_randon_case_by_multi_thread(game_result_list, lose_keyword, continue_lo
 									 continue_lose_num, sample, uuid.uuid4())
 			futures.append(future)
 		for future in as_completed(futures):
-			# print(future.result())
 			total_time += future.result().cost_of_seconds
 			total_sample += future.result().sample_count
-			result_list.append(future.result())
+			result_list.append(copy.copy(future.result()))
+			repository.save(future.result())
 		thread_end_time = time.time()
 		print("thread_time", thread_end_time - thread_start_time)
 		print("total_time", total_time)
 		print("total_time", total_sample)
 		for result in result_list:
+			print(type(result.lose_percent))
 			print(str(result))
 
-
-repository = MatchInfoRepository()
-game_result_list = repository.query_from_statement("2018")
+repository.analysis_record_repository.drop_db()
+repository.analysis_record_repository.init_db()
 # test_actually(game_result_list[0:9])
 
-# for x in range(5):
-test_randon_case_by_multi_thread(game_result_list, "雙", 8, 1000000)
+repository = MatchInfoRepository()
+game_result_list_2018 = repository.query_from_statement("2018")
+game_result_list_2019 = repository.query_from_statement("2019")
+game_result_list_2020 = repository.query_from_statement("2020")
+game_result_list_2021 = repository.query_from_statement("2021")
 
+for x in range(1000):
+	test_randon_case_by_multi_thread(game_result_list_2018, "雙", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2019, "雙", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2020, "雙", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2021, "雙", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2018, "單", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2019, "單", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2020, "單", 8, 10000000)
+	test_randon_case_by_multi_thread(game_result_list_2021, "單", 8, 10000000)

@@ -1,6 +1,6 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine, Column, Integer, String, DATETIME, func, Date
+from sqlalchemy import create_engine, Column, Integer, String, DATETIME, func, Date, FLOAT, Float
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -35,9 +35,9 @@ class AnalysisRecord(Base):
 	sample_end_date = Column("sample_end_date", Date, nullable=False)
 	win_count = Column("win_count", Integer, nullable=False)
 	lose_count = Column("lose_count", Integer, nullable=False)
-	lose_percent = Column("lose_percent", DOUBLE, nullable=False)
-	win_percent = Column("win_percent", DOUBLE, nullable=False)
-	cost_of_seconds = Column("cost_of_seconds", DOUBLE, nullable=False)
+	lose_percent = Column("lose_percent", FLOAT)
+	win_percent = Column("win_percent", FLOAT)
+	cost_of_seconds = Column("cost_of_seconds", FLOAT)
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
 	update_time = Column("update_time", DATETIME, server_default=func.now(), onupdate=func.now(), nullable=False)
 
