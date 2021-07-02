@@ -25,7 +25,7 @@ def get_combination(data_list, index=0, result=[]):
 		result = get_combination(data_list, index + 1, result)
 	return result
 
-
+# 實際數據測試法
 def actually_analysis(combination_list, lose_key, continue_lose_num):
 
 	def is_add_or_odd(game_result):
@@ -66,7 +66,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
 			"組合數": len(combination_list)}
 
-
+# 隨機取樣法
 def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_numb, consider_ignore_game=False):
 
 	def is_add_or_odd(game_result):
