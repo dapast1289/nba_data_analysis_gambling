@@ -4,8 +4,8 @@ from sqlalchemy import create_engine, Column, Integer, String, DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
-# engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
+# engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
+engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
 # metadata = MetaData(engine)
 Base = declarative_base()
 

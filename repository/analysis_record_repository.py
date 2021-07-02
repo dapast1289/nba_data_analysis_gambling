@@ -1,11 +1,12 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine, Column, Integer, String, DECIMAL, Float, DATETIME, func, Date
+from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
-# engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
+# engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
+engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
 Base = declarative_base()
 
 def auto_str(cls):
@@ -26,11 +27,14 @@ class AnalysisRecord(Base):
 	uuid = Column("uuid", String(255), nullable=False)
 	lose_keyword = Column("lose_keyword", String(255), nullable=False)
 	continue_lose_num = Column("continue_lose_num", Integer, nullable=False)
-	sample_number = Column("sample_number", Integer, nullable=False)
+	sample_count = Column("sample_count", Integer, nullable=False)
 	sample_start_date = Column("sample_start_date", Date, nullable=False)
 	sample_end_date = Column("sample_end_date", Date, nullable=False)
-	lose_percent = Column("lose_percent", Float, nullable=False)
-	win_percent = Column("win_percent", Float, nullable=False)
+	win_count = Column("win_count", Integer, nullable=False)
+	loss_count = Column("loss_count", Integer, nullable=False)
+	lose_percent = Column("lose_percent", DOUBLE, nullable=False)
+	win_percent = Column("win_percent", DOUBLE, nullable=False)
+	cost_of_seconds = Column("cost_of_seconds", Integer, nullable=False)
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
 	update_time = Column("update_time", DATETIME, server_default=func.now(), onupdate=func.now(), nullable=False)
 
