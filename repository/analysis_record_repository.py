@@ -9,14 +9,17 @@ from sqlalchemy.orm import sessionmaker
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
 Base = declarative_base()
 
+
 def auto_str(cls):
-    def __str__(self):
-        return '%s(%s)' % (
-            type(self).__name__,
-            ', '.join('%s=%s' % item for item in vars(self).items())
-        )
-    cls.__str__ = __str__
-    return cls
+	def __str__(self):
+		return '%s(%s)' % (
+			type(self).__name__,
+			', '.join('%s=%s' % item for item in vars(self).items())
+		)
+
+	cls.__str__ = __str__
+	return cls
+
 
 @auto_str
 class AnalysisRecord(Base):
@@ -38,6 +41,7 @@ class AnalysisRecord(Base):
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
 	update_time = Column("update_time", DATETIME, server_default=func.now(), onupdate=func.now(), nullable=False)
 
+
 def init_db():
 	Base.metadata.create_all(engine)
 
@@ -47,7 +51,6 @@ def drop_db():
 
 
 class AnalysisRecordRepository:
-
 	Session = sessionmaker(bind=engine)
 	session = Session()
 

@@ -69,7 +69,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			"組合數": len(combination_list)}
 
 # 隨機取樣法
-def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, uuid=uuid.uuid1(), consider_ignore_game=False):
+def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, uuid, consider_ignore_game=False):
 
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
@@ -112,13 +112,15 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon
 	record.win_percent = win_count / (win_count + lose_count) * 100
 	record.lose_percent = lose_count / (win_count + lose_count) * 100
 	record.cost_of_seconds = end_time - start_time
-	return {"lose_percent": lose_count / (win_count + lose_count) * 100,
-			"win_percent": win_count / (win_count + lose_count) * 100,
-			"lose_count": lose_count,
-			"win_count": win_count,
-			"lose_keyword": lose_key,
-			"continue_lose_num": continue_lose_num,
-			"sample_count": randon_sample_count}
+
+	print(str(record))
+	# return {"lose_percent": lose_count / (win_count + lose_count) * 100,
+	# 		"win_percent": win_count / (win_count + lose_count) * 100,
+	# 		"lose_count": lose_count,
+	# 		"win_count": win_count,
+	# 		"lose_keyword": lose_key,
+	# 		"continue_lose_num": continue_lose_num,
+	# 		"sample_count": randon_sample_count}
 
 
 def test_actually(game_result_list):
@@ -136,11 +138,11 @@ def test_actually(game_result_list):
 
 	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
 	actually_randon_combination_test_end = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000))
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid1()))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000, uuid.uuid1()))
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
 
@@ -150,4 +152,4 @@ def test_randon_case(game_result_list):
 
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
-test_actually(game_result_list[0:9])
+test_actually(game_result_list[0:7])
