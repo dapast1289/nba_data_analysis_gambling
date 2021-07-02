@@ -14,5 +14,3 @@
 #     print_hi('PyCharm')
 #
 # # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-import repository.analysis_record_repository
-from repository.analysis_record_repository import AnalysisRecordRepository
