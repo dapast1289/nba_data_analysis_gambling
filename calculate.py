@@ -58,12 +58,12 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 			loss_count += 1
 		else:
 			win_count += 1
-	return {"單雙總數": add_count + odd_count, "單總數": add_count, "雙總數": odd_count,
+	return {"輸的機率": loss_count / len(combination_list) * 100,
+			"贏的機率": win_count / len(combination_list) * 100,
+			"單雙總數": add_count + odd_count, "單總數": add_count, "雙總數": odd_count,
 			"單機率": add_count / (add_count + odd_count) * 100,
 			"雙機率": odd_count / (add_count + odd_count) * 100,
 			"輸的條件": "連續出現 " + str(continue_lose_num) + " 次" + lose_key,
-			"輸的機率": loss_count / len(combination_list) * 100,
-			"贏的機率": win_count / len(combination_list) * 100,
 			"組合數": len(combination_list)}
 
 
@@ -109,13 +109,16 @@ def test_actually(game_result_list):
 
 	# 實際排列組合運算
 	actually_combination_test_start = time.time()
-	print("實際組合勝負計算", actually_analysis(game_combination, "雙", 8))
+	print("實際組合勝負計算", actually_analysis(game_combination, "雙", 4))
 	actually_combination_test_end = time.time()
 	print(f"{actually_combination_test_end - actually_combination_test_start} 秒計算排列組合")
 
 	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 8, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 4, 500000))
 	actually_randon_combination_test_end = time.time()
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
