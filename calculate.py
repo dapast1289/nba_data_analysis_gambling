@@ -52,7 +52,8 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 				numb = continue_lose_num
 			if numb == 0:
 				is_loss = True
-				loss_combination.append(per_combination)
+				# loss_combination.append(per_combination)
+				break
 		if is_loss:
 			loss_count += 1
 		else:
@@ -100,26 +101,21 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, run_nu
 
 
 def test_actually(game_result_list):
+	# 計算排列組合
 	start_time = time.time()
 	game_combination = get_combination(game_result_list)
 	end_time = time.time()
 	print("比賽天數:", len(game_result_list), "比賽組合數:", len(game_combination), f"{end_time - start_time} 秒計算排列組合")
-	# for d in game_combination:
-	# 	temp = []
-	# 	for a in d:
-	# 		re = (a.visitor_total_pts + a.home_total_pts) % 2
-	# 		if re == 0:
-	# 			temp.append("雙")
-	# 		else:
-	# 			temp.append("單")
-	# 	print(temp)
+
+	# 實際排列組合運算
 	actually_combination_test_start = time.time()
-	print("實際組合勝負計算", actually_analysis(game_combination, "雙", 2))
+	print("實際組合勝負計算", actually_analysis(game_combination, "雙", 8))
 	actually_combination_test_end = time.time()
 	print(f"{actually_combination_test_end - actually_combination_test_start} 秒計算排列組合")
 
+	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 2, 500000))
+	print("隨機挑選組合勝負計算", randon_result_analysis(game_result_list, "雙", 8, 500000))
 	actually_randon_combination_test_end = time.time()
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
@@ -130,4 +126,4 @@ def test_randon_case(game_result_list):
 
 repository = MatchInfoRepository()
 game_result_list = repository.query_from_statement("2018")
-test_actually(game_result_list[0:8])
+test_actually(game_result_list[0:9])
