@@ -9,7 +9,6 @@ import repository.analysis_record_repository
 from repository.analysis_record_repository import AnalysisRecord
 from repository.nba_dao import MatchInfoRepository, AnalysisRecordRepository
 
-
 def get_combination(data_list, index=0, result=[]):
 	if index == 0:
 		for value in data_list[index]:
@@ -162,7 +161,6 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 	max_threads = 100
 	sample_per_work = assign_samples_to_each_work(sample_count, max_threads)
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
-		# analysis_record_repository = AnalysisRecordRepository()
 		futures = []
 		thread_start_time = time.time()
 		total_time = 0
@@ -180,10 +178,8 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 		for result in result_list:
 			result.sample_count_of_thread = total_sample
 			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
-		# print("result_list: ", str(result_list[:]))
-		# for idx, data in enumerate(result_list):
-		# 	print("result_list[", idx, "]", str(data))
-		# analysis_record_repository.save_all(result_list)
+		analysis_record_repository = AnalysisRecordRepository()
+		analysis_record_repository.save_all(result_list)
 
 
 repository.nba_dao.drop_db()
@@ -200,9 +196,9 @@ sample_num = 10000
 for x in range(1):
 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
-	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)

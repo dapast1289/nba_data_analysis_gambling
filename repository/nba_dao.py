@@ -9,8 +9,6 @@ from repository.nba_repository import MatchInfo
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 def init_db():
@@ -22,17 +20,19 @@ def drop_db():
 
 
 class MatchInfoRepository:
+	Session = sessionmaker(bind=engine)
+	session = Session()
 
 	def save(self, obj):
-		session.add(obj)
-		session.commit()
+		self.session.add(obj)
+		self.session.commit()
 
 	def save_all(self, obj_list):
-		session.add_all(obj_list)
-		session.commit()
+		self.session.add_all(obj_list)
+		self.session.commit()
 
 	def query_from_statement(self, season):
-		data_list = session.query(MatchInfo).filter(MatchInfo.season == season) \
+		data_list = self.session.query(MatchInfo).filter(MatchInfo.season == season) \
 			.order_by(MatchInfo.game_start_time.asc(), MatchInfo.id).all()
 		result = []
 		index_dic = {}
@@ -62,11 +62,13 @@ class MatchInfoRepository:
 
 
 class AnalysisRecordRepository:
+	Session = sessionmaker(bind=engine)
+	session = Session()
 
 	def save(self, obj):
-		session.add(obj)
-		session.commit()
+		self.session.add(obj)
+		self.session.commit()
 
 	def save_all(self, obj_list):
-		session.add_all(obj_list)
-		session.commit()
+		self.session.add_all(obj_list)
+		self.session.commit()
