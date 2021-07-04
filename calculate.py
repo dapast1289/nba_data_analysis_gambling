@@ -184,12 +184,6 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
 			result.sample_count_of_thread = total_sample
 		repository.save_all(result_list)
-		# print("thread_time", thread_end_time - thread_start_time)
-		# print("total_time", total_time)
-		# print("total_time", total_sample)
-		# for result in result_list:
-		# 	print(type(result.lose_percent))
-		# 	print(str(result))
 
 repository.analysis_record_repository.drop_db()
 repository.analysis_record_repository.init_db()
