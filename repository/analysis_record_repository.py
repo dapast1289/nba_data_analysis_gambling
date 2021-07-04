@@ -5,20 +5,9 @@ from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
+from util import auto_str
+
 Base = declarative_base()
-
-
-def auto_str(cls):
-	def __str__(self):
-		return '%s(%s)' % (
-			type(self).__name__,
-			', '.join('%s=%s' % item for item in vars(self).items())
-		)
-
-	cls.__str__ = __str__
-	return cls
 
 
 @auto_str
@@ -43,24 +32,3 @@ class AnalysisRecord(Base):
 	cost_of_seconds_of_thread = Column("cost_of_seconds_of_thread", FLOAT, nullable=False)
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
 	update_time = Column("update_time", DATETIME, server_default=func.now(), onupdate=func.now(), nullable=False)
-
-
-def init_db():
-	Base.metadata.create_all(engine)
-
-
-def drop_db():
-	Base.metadata.drop_all(engine)
-
-
-class AnalysisRecordRepository:
-	Session = sessionmaker(bind=engine)
-	session = Session()
-
-	def save(self, obj):
-		self.session.add(obj)
-		self.session.commit()
-
-	def save_all(self, obj_list):
-		self.session.add_all(obj_list)
-		self.session.commit()

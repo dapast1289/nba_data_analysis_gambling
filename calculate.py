@@ -9,8 +9,8 @@ from random import randint
 from unicodedata import decimal
 
 import repository.analysis_record_repository
-from repository.analysis_record_repository import AnalysisRecord, AnalysisRecordRepository
-from repository.nba_repository import MatchInfoRepository
+from repository.analysis_record_repository import AnalysisRecord
+from repository.nba_dao import MatchInfoRepository, AnalysisRecordRepository
 
 
 def get_combination(data_list, index=0, result=[]):
@@ -185,23 +185,24 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 			result.sample_count_of_thread = total_sample
 		repository.save_all(result_list)
 
-repository.analysis_record_repository.drop_db()
-repository.analysis_record_repository.init_db()
+
+repository.nba_dao.drop_db()
+repository.nba_dao.init_db()
 # test_actually(game_result_list[0:9])
 
-repository = MatchInfoRepository()
-game_result_list_2018 = repository.query_from_statement("2018")
-game_result_list_2019 = repository.query_from_statement("2019")
-game_result_list_2020 = repository.query_from_statement("2020")
-game_result_list_2021 = repository.query_from_statement("2021")
-
-sample_num = 10000
-for x in range(1):
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
-	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+# repository = MatchInfoRepository()
+# game_result_list_2018 = repository.query_from_statement("2018")
+# game_result_list_2019 = repository.query_from_statement("2019")
+# game_result_list_2020 = repository.query_from_statement("2020")
+# game_result_list_2021 = repository.query_from_statement("2021")
+#
+# sample_num = 10000
+# for x in range(1):
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
+# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
