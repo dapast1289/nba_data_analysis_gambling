@@ -1,9 +1,7 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine, Column, Integer, String, DATETIME, func, Date, FLOAT, Float
-from sqlalchemy.dialects.mysql import DOUBLE
+from sqlalchemy import Column, Integer, String, DATETIME, func, Date, FLOAT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 from util import auto_str
 

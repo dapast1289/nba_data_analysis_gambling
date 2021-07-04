@@ -8,7 +8,7 @@ import repository
 from repository.nba_repository import MatchInfo
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=True)
+engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -24,12 +24,12 @@ def drop_db():
 class MatchInfoRepository:
 
 	def save(self, obj):
-		self.session.add(obj)
-		self.session.commit()
+		session.add(obj)
+		session.commit()
 
 	def save_all(self, obj_list):
-		self.session.add_all(obj_list)
-		self.session.commit()
+		session.add_all(obj_list)
+		session.commit()
 
 	def query_from_statement(self, season):
 		data_list = session.query(MatchInfo).filter(MatchInfo.season == season) \

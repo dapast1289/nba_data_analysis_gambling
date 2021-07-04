@@ -1,12 +1,9 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
-import copy
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from decimal import Decimal
 from random import randint
-from unicodedata import decimal
 
 import repository.analysis_record_repository
 from repository.analysis_record_repository import AnalysisRecord
@@ -161,10 +158,11 @@ def assign_samples_to_each_work(sample_count, max_works):
 
 
 def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, continue_lose_num, sample_count):
-	repository = AnalysisRecordRepository()
+	print("test_randon_case_by_multi_thread(", thread_id, game_result_list, lose_keyword, continue_lose_num, sample_count, ")")
 	max_threads = 100
 	sample_per_work = assign_samples_to_each_work(sample_count, max_threads)
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
+		# analysis_record_repository = AnalysisRecordRepository()
 		futures = []
 		thread_start_time = time.time()
 		total_time = 0
@@ -178,31 +176,33 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 			total_time += future.result().cost_of_seconds
 			total_sample += future.result().sample_count
 			result_list.append(future.result())
-			# repository.save(future.result())
 		thread_end_time = time.time()
 		for result in result_list:
-			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
 			result.sample_count_of_thread = total_sample
-		repository.save_all(result_list)
+			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
+		# print("result_list: ", str(result_list[:]))
+		# for idx, data in enumerate(result_list):
+		# 	print("result_list[", idx, "]", str(data))
+		# analysis_record_repository.save_all(result_list)
 
 
 repository.nba_dao.drop_db()
 repository.nba_dao.init_db()
 # test_actually(game_result_list[0:9])
 
-# repository = MatchInfoRepository()
-# game_result_list_2018 = repository.query_from_statement("2018")
-# game_result_list_2019 = repository.query_from_statement("2019")
-# game_result_list_2020 = repository.query_from_statement("2020")
-# game_result_list_2021 = repository.query_from_statement("2021")
-#
-# sample_num = 10000
-# for x in range(1):
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
-# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+repository = MatchInfoRepository()
+game_result_list_2018 = repository.query_from_statement("2018")
+game_result_list_2019 = repository.query_from_statement("2019")
+game_result_list_2020 = repository.query_from_statement("2020")
+game_result_list_2021 = repository.query_from_statement("2021")
+
+sample_num = 10000
+for x in range(1):
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
+	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
+	# test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)

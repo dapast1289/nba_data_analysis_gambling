@@ -16,7 +16,6 @@
 # # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 import os
 from multiprocessing import Process
-from multiprocessing.pool import Pool
 
 
 def info(title):
