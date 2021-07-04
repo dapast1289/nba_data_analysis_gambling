@@ -148,18 +148,22 @@ def test_actually(game_result_list):
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
 
+def assign_samples_to_each_work(sample_count, max_works):
+	sample_per_work = []
+	divide_sample = sample_count // max_works
+	remain_sample = sample_count % max_works
+	for idx_work in range(max_works):
+		if idx_work == max_works - 1:
+			sample_per_work.append(divide_sample + remain_sample)
+		else:
+			sample_per_work.append(divide_sample)
+	return sample_per_work
+
+
 def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, continue_lose_num, sample_count):
 	repository = AnalysisRecordRepository()
 	max_threads = 100
-	sample_per_work = []
-	divide_sample = sample_count // max_threads
-	remain_sample = sample_count % max_threads
-	for x in range(max_threads):
-		if x == max_threads-1:
-			sample_per_work.append(divide_sample+remain_sample)
-		else:
-			sample_per_work.append(divide_sample)
-
+	sample_per_work = assign_samples_to_each_work(sample_count, max_threads)
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
 		futures = []
 		thread_start_time = time.time()
@@ -197,7 +201,7 @@ game_result_list_2019 = repository.query_from_statement("2019")
 game_result_list_2020 = repository.query_from_statement("2020")
 game_result_list_2021 = repository.query_from_statement("2021")
 
-sample_num = 100000
+sample_num = 10000
 for x in range(1):
 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
