@@ -4,9 +4,12 @@ from sqlalchemy import Integer, Column, String, Date, func, BOOLEAN
 from sqlalchemy.dialects.mysql import FLOAT, DATETIME
 from sqlalchemy.orm import declarative_base
 
+from util import auto_str
+
 Base = declarative_base()
 
 
+@auto_str
 class PerRecord(Base):
 	__tablename__ = "per_record"
 	id = Column("id", Integer, primary_key=True, autoincrement=True)

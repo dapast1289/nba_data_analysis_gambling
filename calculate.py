@@ -1,11 +1,13 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
 import math
+import multiprocessing
 import os
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import Manager
+from multiprocessing.pool import Pool
 from random import randint
 
 import repository.analysis_record_repository
@@ -77,7 +79,7 @@ def actually_analysis(combination_list, lose_key, continue_lose_num):
 
 
 # 隨機取樣法
-def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, thread_id,
+def random_result_analysis(game_result_list, lose_key, continue_lose_num, randon_sample_count, thread_id,
 						   sub_thread_id):
 	# print(uuid, randon_sample_count)
 	def is_add_or_odd(game_result):
@@ -127,7 +129,10 @@ def randon_result_analysis(game_result_list, lose_key, continue_lose_num, randon
 
 
 # TODO
-def randon_result_analysis_by_process(game_result_list, lose_key, continue_lose_num, random_sample_count, process_id):
+def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_num, random_sample_count, process_id,
+									  dict_i, dict):
+	# print("random_result_analysis_by_process(", lose_key, continue_lose_num, random_sample_count,
+	# 	  process_id + "-" + str(os.getpid()), dict_i, dict, ")")
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		if total_pts % 2 == 0:
@@ -139,10 +144,12 @@ def randon_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 	win_count = 0
 	lose_count = 0
 	per_record_list = []
-	for i in random_sample_count:
+	for i in range(random_sample_count):
+	# for i in range(1):
 		init_money = 35000
+		init_gambling_money = 100
 		money = init_money
-		gambling_money = 100
+		gambling_money = init_gambling_money
 		double_money_if_lose = 2.1
 		start_time = time.time()
 		is_loss = False
@@ -162,6 +169,7 @@ def randon_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 				win_money = math.ceil(gambling_money * odds)
 				# 加回現金
 				money += win_money
+				gambling_money = init_gambling_money
 				numb = continue_lose_num
 			if numb == 0:
 				# 出局
@@ -178,20 +186,22 @@ def randon_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 			win_count += 1
 		end_time = time.time()
 		per_record = PerRecord()
-		per_record.process_id = process_id
+		per_record.process_id = process_id + "-" + str(os.getpid()) + "-" + str(i)
 		per_record.season = game_result_list[0][0].season
 		per_record.period_days = day
 		per_record.lose_keyword = lose_key
 		per_record.continue_lose_num = continue_lose_num
 		per_record.sample_start_date = game_result_list[0][0].game_start_time.date()
-		per_record.sample_end_date = game_result_list[0][day - 1].game_start_time.date()
-		per_record.gambling_result = is_loss
+		per_record.sample_end_date = game_result_list[day-1][0].game_start_time.date()
+		per_record.is_loss = is_loss
 		per_record.init_money = init_money
 		per_record.balance_money = money - init_money
 		per_record.finally_money = money
 		per_record.cost_of_seconds = end_time - start_time
 		per_record_list.append(per_record)
-	return per_record_list
+		# print(str(per_record))
+	dict[dict_i] = {"lose_count": lose_count, "win_count": win_count}
+	return dict
 
 
 def test_actually(game_result_list):
@@ -209,12 +219,12 @@ def test_actually(game_result_list):
 
 	# 取樣排列組合運算
 	actually_randon_combination_test_start = time.time()
-	test_1 = randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())
+	test_1 = random_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())
 	print("隨機挑選組合勝負計算", str(test_1))
 	actually_randon_combination_test_end = time.time()
-	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
-	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
-	print("隨機挑選組合勝負計算", str(randon_result_analysis(game_result_list, "雙", 4, 500000, uuid.uuid4())))
+	print("隨機挑選組合勝負計算", str(random_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
+	print("隨機挑選組合勝負計算", str(random_result_analysis(game_result_list, "雙", 4, 1000, uuid.uuid4())))
+	print("隨機挑選組合勝負計算", str(random_result_analysis(game_result_list, "雙", 4, 500000, uuid.uuid4())))
 	print(f"{actually_randon_combination_test_end - actually_randon_combination_test_start} 秒計算排列組合")
 
 
@@ -245,7 +255,7 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 		result_list = []
 		for index, sample in enumerate(sample_per_work):
 			sub_thread_id = str(thread_id) + "-" + str(index)
-			future = executor.submit(randon_result_analysis, game_result_list, lose_keyword, continue_lose_num, sample,
+			future = executor.submit(random_result_analysis, game_result_list, lose_keyword, continue_lose_num, sample,
 									 thread_id, sub_thread_id)
 			futures.append(future)
 		for future in as_completed(futures):
@@ -259,71 +269,22 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 		analysis_record_repository.save_all(result_list)
 
 
-# TODO
-def write(q, game_result_list, lose_keyword, continue_lose_num, sample, process_id, sub_process_id, lock):
-	per_record_list = randon_result_analysis_by_process(game_result_list, lose_keyword, continue_lose_num, sample,
-														process_id + str(os.getpid()), sub_process_id)
-	lock.acquire()  # 加上鎖
-	win_count = 0
-	lose_count = 0
-	for record in per_record_list:
-		if record.gambling_result:
-			win_count += 1
-		else:
-			lose_count += 1
-	process = ProcessRecord()
-	process.process_id
-	process.season
-	process.period_days
-	process.lose_keyword
-	process.continue_lose_num
-	process.sample_count_of_thread
-	process.sample_start_date
-	process.sample_end_date
-	process.win_count = win_count
-	process.lose_count = lose_count
-	process.win_percent = win_count / (win_count + lose_count)
-	process.lose_percent = lose_count / (win_count + lose_count)
-	process.cost_of_seconds
-	q.put(process)
-	lock.release()  # 釋放鎖
-
-
-def test_randon_case_by_multi_process(process_id, game_result_list, lose_keyword, continue_lose_num, sample_count):
-	print("test_randon_case_by_multi_process(", process_id, game_result_list, lose_keyword, continue_lose_num,
-		  sample_count, ")")
+def test_randon_case_by_multi_process(main_process_id, game_result_list, lose_keyword, continue_lose_num, sample_count):
 	sample_per_work = assign_samples_to_each_work(sample_count, max_works=8)
-	analysis_record_repository = NbaDao()
+	# for dict_i in range(len(sample_per_work)):
+	# 	random_result_analysis_by_process(game_result_list, lose_keyword, continue_lose_num, sample_per_work[dict_i],
+	# 			main_process_id, 1, {})
 	with Manager() as manager:
 		dict = manager.dict()
-		q = manager.Queue()
-		lock = manager.Lock()  # 初始化一把鎖
-		p = Pool()
-		pw = p.apply_async(write, args=(q, lock))
-		pr = p.apply_async(read, args=(q,))
-
-		l = manager.list(range(10))
-
-	with ThreadPoolExecutor(max_workers=len(sample_per_work)) as executor:
-		futures = []
-		thread_start_time = time.time()
-		total_time = 0
-		total_sample = 0
-		result_list = []
-		for index, sample in enumerate(sample_per_work):
-			sub_thread_id = str(process_id) + "-" + str(index)
-			future = executor.submit(randon_result_analysis, game_result_list, lose_keyword, continue_lose_num, sample,
-									 process_id, sub_thread_id)
-			futures.append(future)
-		for future in as_completed(futures):
-			total_time += future.result().cost_of_seconds
-			total_sample += future.result().sample_count
-			result_list.append(future.result())
-		thread_end_time = time.time()
-		for result in result_list:
-			result.sample_count_of_thread = total_sample
-			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
-		analysis_record_repository.save_all(result_list)
+		pool = multiprocessing.Pool(len(sample_per_work))
+		for dict_i in range(len(sample_per_work)):
+			pool.apply_async(random_result_analysis_by_process,
+							 args=(game_result_list, lose_keyword, continue_lose_num, sample_per_work[dict_i],
+								   main_process_id, dict_i, dict))
+		pool.close()
+		pool.join()
+		print("len(sample_per_work): ", len(sample_per_work))
+		print("dict:", dict)
 
 
 if __name__ == '__main__':
@@ -339,11 +300,21 @@ if __name__ == '__main__':
 
 	sample_num = 10000
 	for x in range(1):
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
-		test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
+		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+
+	# for x in range(1):
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
+	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
