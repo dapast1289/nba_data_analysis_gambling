@@ -9,6 +9,7 @@ import repository.analysis_record_repository
 from repository.analysis_record_repository import AnalysisRecord
 from repository.nba_dao import MatchInfoRepository, AnalysisRecordRepository
 
+
 def get_combination(data_list, index=0, result=[]):
 	if index == 0:
 		for value in data_list[index]:
