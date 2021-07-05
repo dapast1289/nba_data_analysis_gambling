@@ -19,6 +19,18 @@ def drop_db():
 	repository.analysis_record_repository.Base.metadata.drop_all(engine)
 
 
+class NbaDao:
+	session = Session()
+
+	def save(self, obj):
+		self.session.add(obj)
+		self.session.commit()
+
+	def save_all(self, obj_list):
+		self.session.add_all(obj_list)
+		self.session.commit()
+
+
 class MatchInfoRepository:
 	session = Session()
 

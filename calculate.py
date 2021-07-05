@@ -7,7 +7,7 @@ from random import randint
 
 import repository.analysis_record_repository
 from repository.analysis_record_repository import AnalysisRecord
-from repository.nba_dao import MatchInfoRepository, AnalysisRecordRepository
+from repository.dao import MatchInfoRepository, AnalysisRecordRepository, NbaDao
 
 
 def get_combination(data_list, index=0, result=[]):
@@ -161,7 +161,8 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 	print("test_randon_case_by_multi_thread(", thread_id, game_result_list, lose_keyword, continue_lose_num, sample_count, ")")
 	max_threads = 100
 	sample_per_work = assign_samples_to_each_work(sample_count, max_threads)
-	analysis_record_repository = AnalysisRecordRepository()
+	# analysis_record_repository = AnalysisRecordRepository()
+	analysis_record_repository = NbaDao()
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
 		futures = []
 		thread_start_time = time.time()
@@ -184,8 +185,8 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 
 
 if __name__ == '__main__':
-	repository.nba_dao.drop_db()
-	repository.nba_dao.init_db()
+	repository.dao.drop_db()
+	repository.dao.init_db()
 	# test_actually(game_result_list[0:9])
 
 	match_info_repository = MatchInfoRepository()

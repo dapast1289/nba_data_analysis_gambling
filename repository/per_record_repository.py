@@ -1,20 +1,18 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, String, func, Date
+from sqlalchemy import Integer, Column, String, Date, func
 from sqlalchemy.dialects.mysql import FLOAT, DATETIME
-from sqlalchemy.ext.declarative import declarative_base
-from util import auto_str
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
 
-@auto_str
-class AnalysisRecord(Base):
-	__tablename__ = "analysis_record"
+class PerRecord(Base):
+	__tablename__ = "per_record"
 	id = Column("id", Integer, primary_key=True, autoincrement=True)
 	season = Column("season", String(255), nullable=False)
 	period_days = Column("period_days", Integer, nullable=False)
-	thread_id = Column("thread_id", String(255), nullable=False)
+	process_id = Column("thread_id", String(255), nullable=False)
 	sub_thread_id = Column("sub_thread_id", String(255), nullable=False)
 	lose_keyword = Column("lose_keyword", String(255), nullable=False)
 	continue_lose_num = Column("continue_lose_num", Integer, nullable=False)
