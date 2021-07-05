@@ -7,7 +7,6 @@ from util import auto_str
 
 Base = declarative_base()
 
-
 @auto_str
 class AnalysisRecord(Base):
 	__tablename__ = "analysis_record"

@@ -4,19 +4,25 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import repository
 from repository.nba_repository import MatchInfo
+from repository import analysis_record_repository
+from repository import per_record_repository
+from repository import process_record_repository
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False)
 Session = sessionmaker(bind=engine)
 
 def init_db():
-	repository.analysis_record_repository.Base.metadata.create_all(engine)
+	analysis_record_repository.Base.metadata.create_all(engine)
+	per_record_repository.Base.metadata.create_all(engine)
+	process_record_repository.Base.metadata.create_all(engine)
 
 
 def drop_db():
-	repository.analysis_record_repository.Base.metadata.drop_all(engine)
+	analysis_record_repository.Base.metadata.drop_all(engine)
+	per_record_repository.Base.metadata.drop_all(engine)
+	process_record_repository.Base.metadata.drop_all(engine)
 
 
 class NbaDao:

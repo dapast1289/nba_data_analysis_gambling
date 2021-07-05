@@ -10,9 +10,9 @@ Base = declarative_base()
 class ProcessRecord(Base):
 	__tablename__ = "process_record"
 	id = Column("id", Integer, primary_key=True, autoincrement=True)
+	process_id = Column("process_id", String(255), nullable=False)
 	season = Column("season", String(255), nullable=False)
 	period_days = Column("period_days", Integer, nullable=False)
-	process_id = Column("process_id", String(255), nullable=False)
 	lose_keyword = Column("lose_keyword", String(255), nullable=False)
 	continue_lose_num = Column("continue_lose_num", Integer, nullable=False)
 	sample_count_of_thread = Column("sample_count", Integer, nullable=False)
