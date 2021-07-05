@@ -180,7 +180,6 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 		for result in result_list:
 			result.sample_count_of_thread = total_sample
 			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
-
 		analysis_record_repository.save_all(result_list)
 
 
@@ -188,11 +187,11 @@ repository.nba_dao.drop_db()
 repository.nba_dao.init_db()
 # test_actually(game_result_list[0:9])
 
-repository = MatchInfoRepository()
-game_result_list_2018 = repository.query_from_statement("2018")
-game_result_list_2019 = repository.query_from_statement("2019")
-game_result_list_2020 = repository.query_from_statement("2020")
-game_result_list_2021 = repository.query_from_statement("2021")
+match_info_repository = MatchInfoRepository()
+game_result_list_2018 = match_info_repository.query_from_statement("2018")
+game_result_list_2019 = match_info_repository.query_from_statement("2019")
+game_result_list_2020 = match_info_repository.query_from_statement("2020")
+game_result_list_2021 = match_info_repository.query_from_statement("2021")
 
 sample_num = 10000
 for x in range(1):

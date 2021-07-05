@@ -19,18 +19,6 @@ def drop_db():
 	repository.analysis_record_repository.Base.metadata.drop_all(engine)
 
 
-def save(obj):
-	with Session() as session:
-		session.add(obj)
-		session.commit()
-
-
-def save_all(obj_list):
-	with Session() as session:
-		session.add(obj_list)
-		session.commit()
-
-
 class MatchInfoRepository:
 	session = Session()
 
