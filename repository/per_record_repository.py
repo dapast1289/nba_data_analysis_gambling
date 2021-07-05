@@ -19,6 +19,7 @@ class PerRecord(Base):
 	sample_end_date = Column("sample_end_date", Date, nullable=False)
 	gambling_result = Column("gambling_result", BOOLEAN, nullable=False)
 	init_money = Column("init_money", Integer, nullable=False)
+	balance_money = Column("balance_money", Integer, nullable=False)
 	finally_money = Column("finally_money", Integer, nullable=False)
 	cost_of_seconds = Column("cost_of_seconds", FLOAT, nullable=False)
 	create_time = Column("create_time", DATETIME, server_default=func.now(), nullable=False)
