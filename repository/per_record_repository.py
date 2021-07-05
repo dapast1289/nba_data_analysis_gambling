@@ -20,7 +20,7 @@ class PerRecord(Base):
 	continue_lose_num = Column("continue_lose_num", Integer, nullable=False)
 	sample_start_date = Column("sample_start_date", Date, nullable=False)
 	sample_end_date = Column("sample_end_date", Date, nullable=False)
-	gambling_result = Column("gambling_result", BOOLEAN, nullable=False)
+	is_loss = Column("is_loss", BOOLEAN, nullable=False)
 	init_money = Column("init_money", Integer, nullable=False)
 	balance_money = Column("balance_money", Integer, nullable=False)
 	finally_money = Column("finally_money", Integer, nullable=False)

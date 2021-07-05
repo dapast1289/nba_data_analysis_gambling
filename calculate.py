@@ -185,7 +185,7 @@ def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 			win_count += 1
 		end_time = time.time()
 		per_record = PerRecord()
-		per_record.process_id = process_id + "-" + str(os.getpid()) + "-" + str(i)
+		per_record.process_id = str(process_id) + "-" + str(os.getpid()) + "-" + str(i)
 		per_record.season = game_result_list[0][0].season
 		per_record.period_days = day
 		per_record.lose_keyword = lose_key
@@ -199,7 +199,11 @@ def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 		per_record.cost_of_seconds = end_time - start_time
 		per_record_list.append(per_record)
 		# print(str(per_record))
-	dict[dict_i] = {"lose_count": lose_count, "win_count": win_count}
+	# TODO save to db
+	nba_dao = NbaDao()
+	# print(per_record_list)
+	nba_dao.save_all(per_record_list)
+	dict[dict_i] = {"lose_count": lose_count, "win_count": win_count, "total": lose_count + win_count}
 	return dict
 
 
@@ -274,16 +278,39 @@ def test_randon_case_by_multi_process(main_process_id, game_result_list, lose_ke
 	# 	random_result_analysis_by_process(game_result_list, lose_keyword, continue_lose_num, sample_per_work[dict_i],
 	# 			main_process_id, 1, {})
 	with Manager() as manager:
+		lose_count = 0
+		win_count = 0
 		dict = manager.dict()
 		pool = multiprocessing.Pool(len(sample_per_work))
+		start_time = time.time()
 		for dict_i in range(len(sample_per_work)):
 			pool.apply_async(random_result_analysis_by_process,
 							 args=(game_result_list, lose_keyword, continue_lose_num, sample_per_work[dict_i],
 								   main_process_id, dict_i, dict))
 		pool.close()
 		pool.join()
-		print("len(sample_per_work): ", len(sample_per_work))
-		print("dict:", dict)
+		end_time = time.time()
+		for process in dict:
+			win_count += dict[process]["win_count"]
+			lose_count += dict[process]["lose_count"]
+
+		process_record = ProcessRecord()
+		process_record.process_id = main_process_id
+		process_record.season = game_result_list[0][0].season
+		process_record.period_days = len(game_result_list)
+		process_record.lose_keyword = lose_keyword
+		process_record.continue_lose_num = continue_lose_num
+		process_record.sample_count_of_process = sample_count
+		process_record.sample_start_date = game_result_list[0][0].game_start_time.date()
+		process_record.sample_end_date = game_result_list[-1][0].game_start_time.date()
+		process_record.lose_count = lose_count
+		process_record.win_count = win_count
+		process_record.lose_percent = lose_count / sample_count * 100
+		process_record.win_percent = win_count / sample_count * 100
+		process_record.cost_of_seconds = end_time - start_time
+		process_record_dao = NbaDao()
+		process_record_dao.save(process_record)
+
 
 
 if __name__ == '__main__':
@@ -297,16 +324,16 @@ if __name__ == '__main__':
 	game_result_list_2020 = match_info_repository.query_from_statement("2020")
 	game_result_list_2021 = match_info_repository.query_from_statement("2021")
 
-	sample_num = 10000
+	sample_num = 100000
 	for x in range(1):
 		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "單", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "單", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "單", 8, sample_num)
-		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "單", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "雙", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "雙", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "雙", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "單", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "單", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "單", 8, sample_num)
+		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "單", 8, sample_num)
 
 	# for x in range(1):
 	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
