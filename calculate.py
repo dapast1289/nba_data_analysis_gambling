@@ -131,8 +131,8 @@ def random_result_analysis(game_result_list, lose_key, continue_lose_num, randon
 # TODO
 def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_num, random_sample_count, process_id,
 									  dict_i, dict):
-	# print("random_result_analysis_by_process(", lose_key, continue_lose_num, random_sample_count,
-	# 	  process_id + "-" + str(os.getpid()), dict_i, dict, ")")
+	print("random_result_analysis_by_process(", lose_key, continue_lose_num, random_sample_count,
+		  process_id + "-" + str(os.getpid()), dict_i, dict, ")")
 	def is_add_or_odd(game_result):
 		total_pts = game_result.visitor_total_pts + game_result.home_total_pts
 		if total_pts % 2 == 0:
@@ -145,7 +145,6 @@ def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 	lose_count = 0
 	per_record_list = []
 	for i in range(random_sample_count):
-	# for i in range(1):
 		init_money = 35000
 		init_gambling_money = 100
 		money = init_money
@@ -301,13 +300,13 @@ if __name__ == '__main__':
 	sample_num = 10000
 	for x in range(1):
 		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2019, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2020, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2021, "雙", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2018, "單", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2019, "單", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2020, "單", 8, sample_num)
-		test_randon_case_by_multi_process(uuid.uuid4(), game_result_list_2021, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "單", 8, sample_num)
 
 	# for x in range(1):
 	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)
