@@ -161,6 +161,7 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 	print("test_randon_case_by_multi_thread(", thread_id, game_result_list, lose_keyword, continue_lose_num, sample_count, ")")
 	max_threads = 100
 	sample_per_work = assign_samples_to_each_work(sample_count, max_threads)
+	analysis_record_repository = AnalysisRecordRepository()
 	with ThreadPoolExecutor(max_workers=max_threads) as executor:
 		futures = []
 		thread_start_time = time.time()
@@ -179,7 +180,7 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 		for result in result_list:
 			result.sample_count_of_thread = total_sample
 			result.cost_of_seconds_of_thread = thread_end_time - thread_start_time
-		analysis_record_repository = AnalysisRecordRepository()
+
 		analysis_record_repository.save_all(result_list)
 
 

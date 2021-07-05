@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Column, Integer, String, DATETIME, func, Date, FLOAT
 from sqlalchemy.ext.declarative import declarative_base
-
 from util import auto_str
 
 Base = declarative_base()

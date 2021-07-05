@@ -9,7 +9,7 @@ from repository.nba_repository import MatchInfo
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False)
-
+Session = sessionmaker(bind=engine)
 
 def init_db():
 	repository.analysis_record_repository.Base.metadata.create_all(engine)
@@ -19,8 +19,19 @@ def drop_db():
 	repository.analysis_record_repository.Base.metadata.drop_all(engine)
 
 
+def save(obj):
+	with Session() as session:
+		session.add(obj)
+		session.commit()
+
+
+def save_all(obj_list):
+	with Session() as session:
+		session.add(obj_list)
+		session.commit()
+
+
 class MatchInfoRepository:
-	Session = sessionmaker(bind=engine)
 	session = Session()
 
 	def save(self, obj):
@@ -62,7 +73,6 @@ class MatchInfoRepository:
 
 
 class AnalysisRecordRepository:
-	Session = sessionmaker(bind=engine)
 	session = Session()
 
 	def save(self, obj):
