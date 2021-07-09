@@ -3,6 +3,7 @@
 import math
 import multiprocessing
 import os
+import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -144,6 +145,9 @@ def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 	win_count = 0
 	lose_count = 0
 	per_record_list = []
+	nba_dao = NbaDao()
+	save_data_size_range = random_sample_count // 20
+	progress = 0
 	for i in range(random_sample_count):
 		init_money = 35000
 		init_gambling_money = 100
@@ -198,15 +202,19 @@ def random_result_analysis_by_process(game_result_list, lose_key, continue_lose_
 		per_record.finally_money = money
 		per_record.cost_of_seconds = end_time - start_time
 		per_record_list.append(per_record)
-		# print(str(per_record))
-	# TODO save to db
-	nba_dao = NbaDao()
-	# print(per_record_list)
+		if len(per_record_list) > save_data_size_range:
+			progress += len(per_record_list)
+			threading.Thread(target=nba_dao.save_all, args=(per_record_list.copy(),)).start()
+			# nba_dao.save_all(per_record_list)
+			per_record_list = []
+			print(str(process_id) + "-" + str(os.getpid()) + ":", str(progress / random_sample_count * 100), "%")
 	nba_dao.save_all(per_record_list)
+	print(str(process_id) + "-" + str(os.getpid()) + ": 100%")
 	dict[dict_i] = {"lose_count": lose_count, "win_count": win_count, "total": lose_count + win_count}
 	return dict
 
 
+# 實際跑遍所有組合，連算九天組合約一千萬筆
 def test_actually(game_result_list):
 	# 計算排列組合
 	start_time = time.time()
@@ -273,7 +281,7 @@ def test_randon_case_by_multi_thread(thread_id, game_result_list, lose_keyword, 
 
 
 def test_randon_case_by_multi_process(main_process_id, game_result_list, lose_keyword, continue_lose_num, sample_count):
-	sample_per_work = assign_samples_to_each_work(sample_count, max_works=8)
+	sample_per_work = assign_samples_to_each_work(sample_count, max_works=6)
 	# for dict_i in range(len(sample_per_work)):
 	# 	random_result_analysis_by_process(game_result_list, lose_keyword, continue_lose_num, sample_per_work[dict_i],
 	# 			main_process_id, 1, {})
@@ -324,16 +332,16 @@ if __name__ == '__main__':
 	game_result_list_2020 = match_info_repository.query_from_statement("2020")
 	game_result_list_2021 = match_info_repository.query_from_statement("2021")
 
-	sample_num = 100000
+	sample_num = 1000000
 	for x in range(1):
 		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "雙", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "雙", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "雙", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "雙", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "單", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "單", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "單", 8, sample_num)
-		# test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "雙", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2018, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2019, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2020, "單", 8, sample_num)
+		test_randon_case_by_multi_process(str(uuid.uuid4()), game_result_list_2021, "單", 8, sample_num)
 
 	# for x in range(1):
 	# 	test_randon_case_by_multi_thread(uuid.uuid4(), game_result_list_2018, "雙", 8, sample_num)

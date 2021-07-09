@@ -1,8 +1,9 @@
 #!/user/bin/env python3
 # -*- coding: utf-8 -*-
+import time
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 from repository.nba_repository import MatchInfo
 from repository import analysis_record_repository
@@ -10,8 +11,9 @@ from repository import per_record_repository
 from repository import process_record_repository
 
 # engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db_test", echo=True)
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False)
-Session = sessionmaker(bind=engine)
+engine = create_engine("mysql+pymysql://root:root@localhost:3306/nba_db", echo=False, pool_size=100, max_overflow=2000)
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
 
 def init_db():
 	analysis_record_repository.Base.metadata.create_all(engine)
@@ -26,19 +28,31 @@ def drop_db():
 
 
 class NbaDao:
-	session = Session()
+	# session = Session()
+
+	# def __init__(self):
+		# self.session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+		# self.session = scoped_session(Session())
 
 	def save(self, obj):
-		self.session.add(obj)
-		self.session.commit()
+		session = Session()
+		session.add(obj)
+		session.commit()
 
 	def save_all(self, obj_list):
-		self.session.add_all(obj_list)
-		self.session.commit()
+		start_time = time.time()
+		session = Session()
+		session.add_all(obj_list)
+		session.commit()
+		end_time = time.time()
+		print("spend time to save_all: ", end_time - start_time, "list size:", len(obj_list))
+		Session.remove()
+	# def close(self):
+	# 	self.session.remove()
 
 
 class MatchInfoRepository:
-	session = Session()
+	session = session_factory()
 
 	def save(self, obj):
 		self.session.add(obj)
@@ -79,7 +93,7 @@ class MatchInfoRepository:
 
 
 class AnalysisRecordRepository:
-	session = Session()
+	session = session_factory()
 
 	def save(self, obj):
 		self.session.add(obj)
